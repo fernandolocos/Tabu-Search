@@ -10,7 +10,7 @@ Compiler
 To run the script supply one of the villian teams without the budget restriction:
 
 ```
-    $ ./tabu instances/V2_763.txt 0
+    $ ./tabu data/instances/V2_763.txt 0
 ```
 
 To run the script supply one of the villian teams with the budget restriction:

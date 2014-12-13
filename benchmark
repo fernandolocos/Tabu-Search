@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-INSTANCES=$(ls instances/*.txt | sort -n -t V -k 2)
+INSTANCES=$(ls data/instances/*.txt | sort -n -t V -k 2)
+
 echo -e "----------------------------------------" > our_results.txt
 echo -e "without_budget" >> our_results.txt
 echo -e "----------------------------------------" >> our_results.txt
@@ -13,6 +14,7 @@ do
   echo -e "${NAMES[$COUNT]%.*}\t${COLLABORATION[$COUNT]}" >> our_results.txt
   COUNT=$[$COUNT+1]
 done
+
 #echo -e "----------------------------------------" >> our_results.txt
 #echo -e "\twith_budget\t" >> our_results.txt
 #echo -e "----------------------------------------" >> our_results.txt
@@ -25,4 +27,5 @@ done
 #  echo -e "${NAMES[$COUNT]%.*}\t${COLLABORATION[$COUNT]}}" >> our_results.txt
 #  COUNT=$[$COUNT+1]
 #done
-#echo "$(column -t our_results.txt)" > our_results.txt
+
+echo "$(column -t our_results.txt)" > our_results.txt

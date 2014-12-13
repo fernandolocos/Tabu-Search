@@ -1,9 +1,10 @@
 
 CC=gcc
 CPPC=g++
-CFLAGS= -Wall -lm
+CFLAGS= -Wall -lm -std=c++11
 DEBUGFLAGS= -g -O0 -fno-inline
 OPTFLAGS= -O2
+ENDFLAGS=-lpthread
 
 c: clean
 c: COMPILER=$(CC)
@@ -26,7 +27,7 @@ cpp-debug: CFLAGS += $(DEBUGFLAGS)
 cpp-debug: tabu
 
 tabu: main.o tabu.o
-	$(COMPILER) $(CFLAGS) -o tabu main.o tabu.o
+	$(COMPILER) $(CFLAGS) -o tabu main.o tabu.o $(ENDFLAGS)
 	
 main.o:
 	$(COMPILER) $(CFLAGS) -o main.o -c main.cpp 

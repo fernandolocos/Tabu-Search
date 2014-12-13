@@ -1,3 +1,6 @@
+// uncomment if error 'undefined reference to `pthread_create'' appear
+//#define CSV_IO_NO_THREAD 1;
+
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -5,29 +8,48 @@
 #include <string>
 #include <time.h>
 #include <stdlib.h>
+#include <sstream>
+#include "lib/csv.h"
 #include "tabu.h"
 
 using namespace std;
 
-void readInstance(const char *instance, vector<character> &heroes, 
-	vector<character> &villains, vector<collaboration> &collab, 
+void readInstance(const char *instance, vector<character> &heroes,
+	vector<character> &villains, vector<collaboration> &collab,
 	vector<int> &team_villains)
 {
-	int i, id, intelligence, strength, speed, durability, energy, fighting, 
+	int id, intelligence, strength, speed, durability, energy, fighting,
 		numberAppeared, c1, c2, value, idVillain;
-   string name, type, inst = (string) instance;
+   string name, type;
 
 	// abre os arquivos de leitura
-	ifstream file1, file2, file3;   				
-	file1.open("marvel_characters.txt");  
-	file2.open("shared_comic_books.txt");
-	file3.open(instance);
+	ifstream villains_file;
 
-	// faz a leitura do file1 e cria os vetores de personagens
-	for (i = 0; i < 767; i++) {
-		file1 >> id >> name >> type >> intelligence >> strength >> speed >> 
-			durability >> energy >> fighting >> numberAppeared;
-			
+  // le os arquivos csv de entrada
+	io::CSVReader<10, io::trim_chars<' ', '\t'>, io::no_quote_escape<';'> > marvel_characters("data/marvel_characters.csv");
+	marvel_characters.read_header(io::ignore_extra_column,
+		"Character ID",
+		"Character Name",
+		"Hero or Villain",
+		"Intelligence",
+		"Strength",
+		"Speed",
+		"Durability",
+		"Energy Projection",
+		"Fighting Skills",
+		"Number of Comic Books Where Character Appeared");
+
+	io::CSVReader<3, io::trim_chars<' ', '\t'>, io::no_quote_escape<';'> > shared_comic_books("data/shared_comic_books.csv");
+	shared_comic_books.read_header(io::ignore_extra_column,
+		"Character 1 ID",
+		"Character 2 ID",
+		"Number of Comic Books Where Character 1 and Character 2 Both Appeared");
+
+	villains_file.open(instance);
+
+	// faz a leitura do marvel_characters e cria os vetores de personagens
+	while (marvel_characters.read_row(id, name, type, intelligence, strength, speed, durability,
+		energy, fighting, numberAppeared)) {
 		if(type == "hero") {
 			heroes.push_back(character(id, name, intelligence, strength, speed, 
 				durability, energy, fighting, numberAppeared));
@@ -37,24 +59,22 @@ void readInstance(const char *instance, vector<character> &heroes,
 		}
 	}
 
-	// faz a leitura do file2 e cria o vetor de colaboracoes
-	for (i = 0; i < 57308; i++) {
-		file2 >> c1 >> c2 >> value;
+	// faz a leitura do shared_comic_books e cria o vetor de colaboracoes
+	while (shared_comic_books.read_row(c1, c2, value)) {
 		collab.push_back(collaboration(c1, c2, value));
 	}
-	 
+
 	// faz a leitura do file3 e cria o vetor de team_villains
-	inst.replace(0,11,"");
-	inst.replace(inst.end()-8,inst.end(),"");
-	instance = inst.c_str();;
-	for (i = 0; i < atoi(instance); i++) {
-		file3 >> idVillain;
-		team_villains.push_back(idVillain);
+	string line;
+	while (getline(villains_file, line, ' ')) {
+		if (!line.empty()) {
+			istringstream tmp(line);
+			tmp >> idVillain;
+			team_villains.push_back(idVillain);
+		}
 	}
 
-	file1.close();
-	file2.close();
-	file3.close();
+	villains_file.close();
 }
 
 void printInstance(vector<character> heroes, vector<character> villains, 
@@ -114,8 +134,8 @@ void printSolution(vector<int> team_heroes, vector<int> team_villains,
 }
 
 int main(int argc, char **argv)
-{   
-   vector<character> heroes, villains;
+{
+	vector<character> heroes, villains;
 	vector<collaboration> collab;
 	vector<int> team_heroes, team_villains;
 	int budget, collaboration_lv, fighting_exp;
