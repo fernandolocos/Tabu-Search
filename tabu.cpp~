@@ -392,7 +392,7 @@ vector<int> initial_solution(vector<character> heroes, vector<character> villain
 /* busca de uma boa solucao (mesmo que inviavel) 
 partindo da solucao retornada pelo algoritmo de construcao inicial 
 verifico se ela eh tem custo > budget se sim, troca
-o heroi de maior custo por um heroi de custo mais baixo (seguindo algum criterio) 
+o heroi de maior custo por um heroi de custo mais baixo 
 se nao, troca o heroi de menor custo por um heroi de maior custo. 
 Faça isso por um numero de iteracoes fixo.
 */
@@ -402,4 +402,5 @@ partindo da solucao do algoritmo que encontra uma boa solucao,
 executa uma busca local, ou seja, troca heroi pelo
 seus vizinhos em termos de custo, a fim de encontrar a melhor solucao que 
 seja viavel
+DICA: criar um vetor que contenha o custo de cada heroi
 */

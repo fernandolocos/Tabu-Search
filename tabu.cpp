@@ -373,8 +373,8 @@ vector<int> initial_solution(vector<character> heroes, vector<character> villain
 				
 				idRm = 1;
 				cont++;
-				cout << "Removeu\n";
-				printTeam(team_heroes);
+				//cout << "Removeu\n";
+				//printTeam(team_heroes);
 			}
 			
 			// busca o heroi que tem maior collaboration_level + fighting_experience
@@ -382,7 +382,7 @@ vector<int> initial_solution(vector<character> heroes, vector<character> villain
 			idHero = collab_fighting_max(collab, team_heroes, team_villains, tabu_list);
 			team_heroes.push_back(idHero);
 			
-			printTeam(team_heroes);
+			//printTeam(team_heroes);
 		}
 	} while(!is_viavel);
 	
