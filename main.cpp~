@@ -132,7 +132,6 @@ int main(int argc, char **argv)
    //printInstance(heroes, villains, collab, team_villains);
 
 	if(budget){
-		// fiz isso so pra rodar e nao dar bug
 		team_heroes = initial_solution(heroes,villains,collab,team_villains,budget);
 	}
 	else {

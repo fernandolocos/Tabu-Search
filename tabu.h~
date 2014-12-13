@@ -7,7 +7,7 @@
 
 #define HEROES_SIZE 381
 #define VILLAINS_SIZE 386
-#define TABU_LIST_MAX 10
+#define TABU_LIST_MAX 20
 
 using namespace std;
 
