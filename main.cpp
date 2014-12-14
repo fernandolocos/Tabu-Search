@@ -102,16 +102,16 @@ void printInstance(vector<character> heroes, vector<character> villains,
     /*cout << "\nCOLLAB\n";
     unsigned int j;
     for (i = 0; i < heroes.size(); i++) {
-    	for (j = 0; j < heroes.size(); j++) {
-    		collaboration character_collab = collab[make_pair(heroes[i].id, heroes[j].id)];
-    		cout << character_collab.c1  << " " << character_collab.c2 << " "
-    			<< character_collab.value << "\n";
-    	}
-    	for (j = 0; j < villains.size(); j++) {
-    		collaboration character_collab = collab[make_pair(heroes[i].id, villains[j].id)];
-    		cout << character_collab.c1  << " " << character_collab.c2 << " "
-    			<< character_collab.value << "\n";
-    	}
+        for (j = 0; j < heroes.size(); j++) {
+            collaboration character_collab = collab[make_pair(heroes[i].id, heroes[j].id)];
+            cout << character_collab.c1  << " " << character_collab.c2 << " "
+                << character_collab.value << "\n";
+        }
+        for (j = 0; j < villains.size(); j++) {
+            collaboration character_collab = collab[make_pair(heroes[i].id, villains[j].id)];
+            cout << character_collab.c1  << " " << character_collab.c2 << " "
+                << character_collab.value << "\n";
+        }
     }*/
 
     cout << "\nTEAM VILLAINS\n";
@@ -128,7 +128,7 @@ void printSolution(vector<int> team_heroes, vector<int> team_villains,
 
     if(budget) {
         cout << solution <<" "<< collaboration_lv <<" "<< fighting_exp
-             <<" "<<	team_heroes[0];
+             <<" "<< team_heroes[0];
         for (i = 1; i < team_heroes.size(); i++) {
             cout << "," << team_heroes[i];
         }

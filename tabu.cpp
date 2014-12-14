@@ -101,12 +101,12 @@ double calculate_budget(vector<character> heroes, vector<character> villains,
     vtsize = team_villains.size();
 
     // Exp1
-    ratiopg 	= 	avgpg / teamVilAvgPG;
-    ratiopop = 	avgpop / teamVilAvgPop;
+    ratiopg = avgpg / teamVilAvgPG;
+    ratiopop = avgpop / teamVilAvgPop;
 
     for (i = 0; i < team_villains.size(); i++) {
         id = team_villains[i] - (heroes.size()+1);
-        vtcost	+= calculate_avg_powergrid_character(heroes, villains, team_villains[i]) *
+        vtcost += calculate_avg_powergrid_character(heroes, villains, team_villains[i]) *
                    villains[id].numberAppeared;
     }
 
@@ -376,7 +376,7 @@ vector<int> solution_with_budget(vector<character> heroes, vector<character> vil
 
     // calcula a media de budgets do time de viloes
     budget = calculate_budget(heroes, villains, collab, team_villains);
-    avgBudget = budget /	(int)teamMaxSize;
+    avgBudget = budget / (int)teamMaxSize;
 
     // Busque no vetor o heroi com maior custo que respeite a restrição:
     // custo <= budget médio
