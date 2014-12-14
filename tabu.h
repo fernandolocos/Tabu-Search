@@ -9,6 +9,7 @@
 
 #define TABU_LIST_MAX_1 10
 #define TABU_LIST_MAX_2 150
+#define ITERATIONS 10
 
 using namespace std;
 
