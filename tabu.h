@@ -93,7 +93,4 @@ int fighting_experience(vector<int> team_heroes, vector<int> team_villains,
 double calculate_budget(vector<character> heroes, vector<character> villains,
                         map<pair<int, int>, collaboration> collab, vector<int> team_villains);
 
-unsigned int calculate_hero_cost(vector<character> heroes, int hero);
-
-
 
