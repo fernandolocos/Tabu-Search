@@ -1,8 +1,6 @@
 #include "tabu.h"
 using namespace std;
 
-bool sortCosts (Costs i,Costs j) {return (i.cost>j.cost);}
-
 // calcula o powergrid medio de um heroi ou vilao
 double calculate_avg_powergrid_character(vector<character> heroes, vector<character> p, int idP)
 {
@@ -391,8 +389,8 @@ vector<int> solution_with_budget(vector<character> heroes, vector<character> vil
 	}
 	
 	// ordena o vetor descrescente pelo custo
-	sort(heroCosts.begin(), heroCosts.end(), sortCosts);
-			
+	sort(heroCosts.begin(), heroCosts.end(), greater<Costs>());
+
 	// calcula a media de budgets do time de viloes
 	budget = calculate_budget(heroes, villains, collab, team_villains);
 	avgBudget = budget /	(int)teamMaxSize;

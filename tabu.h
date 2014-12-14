@@ -23,9 +23,6 @@ struct character {
     int fighting;
     int numberAppeared;
 
-    // used only for heroes
-    unsigned int cost;
-
     character(int id, std::string name, int intelligence, int strength,
     	int speed, int durability, int energy, int fighting, int numberAppeared){
 			this->id = id;
@@ -38,17 +35,6 @@ struct character {
 			this->fighting = fighting;
 			this->numberAppeared = numberAppeared;
     };
-
-    // comparator for heroes
-	bool operator<(const character& rhs) const {
-		return this->cost < rhs.cost;
-	};
-	bool operator>(const character& rhs) const {
-		return this->cost > rhs.cost;
-	};
-	bool operator=(const character& rhs) const {
-		return this->cost == rhs.cost;
-	};
 };
 
 struct collaboration {
@@ -65,17 +51,6 @@ struct collaboration {
         this->c2 = c2;
         this->value = value;
     };
-
-    // comparator for collaboration
-	/*bool operator<(const collaboration& rhs) const {
-		return this->value < rhs.value;
-	};
-	bool operator>(const collaboration& rhs) const {
-		return this->value > rhs.value;
-	};
-	bool operator=(const collaboration& rhs) const {
-		return this->value == rhs.value;
-	};*/
 };
 
 // cria uma estrutura que armazena custos e ids
@@ -87,6 +62,17 @@ typedef struct Costs {
 		this->id = id;
 		this->cost = cost;
 	}
+
+  // comparator for costs
+  bool operator<(const Costs& rhs) const {
+    return this->cost < rhs.cost;
+  };
+  bool operator>(const Costs& rhs) const {
+    return this->cost > rhs.cost;
+  };
+  bool operator==(const Costs& rhs) const {
+    return this->cost == rhs.cost;
+  };
 } Costs;
 
 void readInstance(const char *instance, vector<character> &heroes, 

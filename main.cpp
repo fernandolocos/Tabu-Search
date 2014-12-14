@@ -160,14 +160,7 @@ int main(int argc, char **argv)
    readInstance(argv[1], heroes, villains, collab, team_villains);
    //printInstance(heroes, villains, collab, team_villains);
 
-   //sort(collab.begin(), collab.end(), greater<collaboration>());
-
 	if(has_budget){
-		/*for (i = 0; i < heroes.size(); i++) {
-			heroes[i].cost = calculate_hero_cost(heroes, heroes[i].id);
-		}*/
-		//sort(heroes.begin(), heroes.end(), greater<character>());
-
 		budget = calculate_budget(heroes, villains, collab, team_villains);
 		team_heroes = solution_with_budget(heroes,villains,collab,team_villains, budget, has_budget);
 	}
