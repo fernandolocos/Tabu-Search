@@ -4,13 +4,13 @@ using namespace std;
 bool sortCosts (Costs i,Costs j) {return (i.cost>j.cost);}
 
 // calcula o powergrid medio de um heroi ou vilao
-double calculate_avg_powergrid_character(vector<character> p, int idP)
+double calculate_avg_powergrid_character(vector<character> heroes, vector<character> p, int idP)
 {
 	unsigned int id, idInc;
 	double value = 0;
 	
-	if(p.size() == HEROES_SIZE) idInc = 1;
-	else idInc = HEROES_SIZE + 1;
+	if(p.size() == heroes.size()) idInc = 1;
+	else idInc = heroes.size() + 1;
 	id = idP - idInc;
 	
 	value += p[id].intelligence;
@@ -24,13 +24,13 @@ double calculate_avg_powergrid_character(vector<character> p, int idP)
 }
 
 // calcula o powergrid medio de um time de herois ou viloes
-double calculate_avg_powergrid_team(vector<character> p, vector<int> team)
+double calculate_avg_powergrid_team(vector<character> heroes, vector<character> p, vector<int> team)
 {
 	unsigned int i, id, idInc;
 	double value = 0;
 	
-	if(p.size() == HEROES_SIZE) idInc = 1;
-	else idInc = HEROES_SIZE + 1;
+	if(p.size() == heroes.size()) idInc = 1;
+	else idInc = heroes.size() + 1;
 	
 	for (i = 0; i < team.size(); i++) {
 		id = team[i] - idInc;
@@ -65,13 +65,13 @@ double calculate_avg_powergrid(vector<character> p)
 }
 
 // calcula  a popularidade media de um time de herois ou viloes
-double calculate_avg_popularity_team(vector<character> p, vector<int> team)
+double calculate_avg_popularity_team(vector<character> heroes, vector<character> p, vector<int> team)
 {
 	unsigned int i, id, idInc;
 	double value = 0;
 	
-	if(p.size() == HEROES_SIZE) idInc = 1;
-	else idInc = HEROES_SIZE + 1;
+	if(p.size() == heroes.size()) idInc = 1;
+	else idInc = heroes.size() + 1;
 	
 	for (i = 0; i < team.size(); i++) {
 		id = team[i] - idInc;
@@ -94,37 +94,37 @@ double calculate_avg_popularity(vector<character> p)
 }
 
 double calculate_budget(vector<character> heroes, vector<character> villains,
-	vector<collaboration> collab, vector<int> team_villains)
+	map<pair<int, int>, collaboration> collab, vector<int> team_villains)
 {
 	unsigned int i;
 	int id; 
 	double exp1, ratiopg, ratiopop, vtcost = 0, exp2, factor, avgpg, 
 		avgpop, vtsize, teamVilAvgPG, vilAvgPG, teamVilAvgPop;
 	
-	teamVilAvgPG = calculate_avg_powergrid_team(villains, team_villains);
+	teamVilAvgPG = calculate_avg_powergrid_team(heroes, villains, team_villains);
 	vilAvgPG = calculate_avg_powergrid(villains);
-	teamVilAvgPop = calculate_avg_popularity_team(villains, team_villains);
+	teamVilAvgPop = calculate_avg_popularity_team(heroes, villains, team_villains);
 	avgpg = calculate_avg_powergrid(heroes);
 	avgpop = calculate_avg_popularity(heroes);
 	vtsize = team_villains.size();
-		
+
 	// Exp1
 	ratiopg 	= 	avgpg / teamVilAvgPG;
 	ratiopop = 	avgpop / teamVilAvgPop;
-									
+
 	for (i = 0; i < team_villains.size(); i++) {
-		id = team_villains[i] - (HEROES_SIZE+1);
-		vtcost	+= calculate_avg_powergrid_character(villains, team_villains[i]) *
+		id = team_villains[i] - (heroes.size()+1);
+		vtcost	+= calculate_avg_powergrid_character(heroes, villains, team_villains[i]) *
 						villains[id].numberAppeared;
 	}
-					
+
 	exp1 = ratiopg * ratiopop * vtcost;
-	
+
 	// Exp2
 	factor = teamVilAvgPG / vilAvgPG;
 	exp2 = factor * avgpg * avgpop * vtsize;
-	
-	// return budget	
+
+	// return budget
 	return max(exp1, exp2);
 }
 
@@ -135,7 +135,7 @@ double calculate_cost(vector<character> heroes, vector<int> team_heroes)
 	double cost = 0, avgPg, avgPop;
 	for (i = 0; i < team_heroes.size(); i++) {
 		// calcula o powergrid do heroi
-		avgPg = calculate_avg_powergrid_character(heroes, team_heroes[i]);
+		avgPg = calculate_avg_powergrid_character(heroes, heroes, team_heroes[i]);
 	
 		// busca a popularidade do heroi
 		avgPop = heroes[team_heroes[i]-1].numberAppeared;
@@ -149,51 +149,38 @@ double calculate_cost(vector<character> heroes, vector<int> team_heroes)
 double calculate_cost(vector<character> heroes, int idHero)
 {
 	double pg, pop;
-	pg = calculate_avg_powergrid_character(heroes, idHero);
+	pg = calculate_avg_powergrid_character(heroes, heroes, idHero);
 	pop = heroes[idHero-1].numberAppeared;
 	return pg * pop;
 }
 
 int fighting_experience(vector<int> team_heroes, vector<int> team_villains, 
-	vector<collaboration> collab)
+	map<pair<int, int>, collaboration> collab)
 {
-	unsigned int i, j, k;
+	unsigned int i, j;
 	int fighting_exp = 0;
 	
 	//cout << "\nFIGHTING EXPERIENCE\n";
 	for (i = 0; i < team_heroes.size(); i++) {
 		for (j = 0; j < team_villains.size(); j++) {
-			for (k = 0; k < collab.size(); k++) {
-				if((collab[k].c1 == team_heroes[i] && collab[k].c2 == team_villains[j])
-					|| (collab[k].c2 == team_heroes[i] && collab[k].c1 == team_villains[j])){
-					//cout << team_heroes[i] << "->" << team_villains[j] << "=" << collab[k].value << "\n" ;
-					fighting_exp += collab[k].value;
-					break;
-				}
-			}
+			fighting_exp += collab[make_pair(team_heroes[i],team_villains[j])].value;
 		}
 	}
 	
 	return fighting_exp;
 }
 
-int collaboration_level(vector<int> team_heroes, vector<collaboration> collab)
+int collaboration_level(vector<int> team_heroes, map<pair<int, int>, collaboration> collab)
 {
-	unsigned int i, j, k;
+	unsigned int i, j;
 	int collaboration_lv = 0;
 	
 	//cout << "\nCOLABORACOES HEROIS\n";
-	// calcula a colaboracao enter os herois
+	// calcula a colaboracao entre os herois
 	for (i = 0; i < team_heroes.size()-1; i++) {
 		for (j = i+1; j < team_heroes.size(); j++) {
-			for (k = 0; k < collab.size(); k++) {
-				if((collab[k].c1 == team_heroes[i] && collab[k].c2 == team_heroes[j])
-					|| (collab[k].c2 == team_heroes[i] && collab[k].c1 == team_heroes[j])){
-					//cout << team_heroes[i] << "->" << team_heroes[j] << "=" << collab[k].value << "\n" ;
-					collaboration_lv += collab[k].value;
-					break;
-				}
-			}
+			//cout << team_heroes[i] << "->" << team_heroes[j] << "=" << collab[k].value << "\n" ;
+			collaboration_lv += collab[make_pair(team_heroes[i], team_heroes[j])].value;
 		}
 	}	
 	
@@ -210,14 +197,8 @@ bool in_vector(vector<int> v, int id) {
 	return false;
 }
 
-bool isHero(int idCharacter) {
-	if(idCharacter <= HEROES_SIZE)
-			return true;
-	return false;
-}
-
 bool is_viable_solution(vector<character> heroes, vector<character> villains, 
-	vector<collaboration> collab, vector<int> team_heroes, vector<int> team_villains, double budget)
+	map<pair<int, int>, collaboration> collab, vector<int> team_heroes, vector<int> team_villains, double budget)
 {
 	unsigned int i, idHero, idVillain, teamMaxSize = team_villains.size();
 	vector<int> pgHeroes (6);
@@ -245,7 +226,7 @@ bool is_viable_solution(vector<character> heroes, vector<character> villains,
 	}
 	
 	for (i = 0; i < team_villains.size(); i++) {
-		idVillain = team_villains[i] - HEROES_SIZE+1; // ajusta o id
+		idVillain = team_villains[i] - heroes.size()+1; // ajusta o id
 		pgVillains[0] += villains[idVillain].intelligence;
 		pgVillains[1] += villains[idVillain].strength;
 		pgVillains[2] += villains[idVillain].speed;
@@ -269,69 +250,54 @@ bool is_viable_solution(vector<character> heroes, vector<character> villains,
 
 /* retorna o id do heroi com maior
  fighting_experience contra os viloes de um determinado time */
-int fighting_experience_max(vector<collaboration> collab, 
+int fighting_experience_max(vector<character> heroes, map<pair<int, int>, collaboration> collab, 
 	vector<int> team_villains)
 {
-	int i, idHero = 0, fight_exp, fight_exp_max = 0;
-	unsigned int j, k;
-	
-	for (i = 1; i <= HEROES_SIZE; i++) {
+	unsigned int i, j, idHero = 0, fight_exp, fight_exp_max = 0;
+
+	for (i = 0; i < heroes.size(); i++) {
 		fight_exp = 0;
 		for (j = 0; j < team_villains.size(); j++) {
-			for (k = 0; k < collab.size(); k++) {
-				if(collab[k].c1 == i && collab[k].c2 == team_villains[j]){
-					fight_exp += collab[k].value;
-					break;
-				}
-			}
+			fight_exp += collab[make_pair(heroes[i].id, team_villains[j])].value;
 		}
+
 		// se a fighting_experience desse heroi for maior atualiza
 		if(fight_exp_max < fight_exp) {
 			fight_exp_max = fight_exp;
-			idHero = i;
+			idHero = heroes[i].id;
 		}
 	}
 	return idHero;
-}	
+}
 
 /* retorna o id do heroi que melhor maximize a solucao */
-int collab_fighting_max(vector<collaboration> collab, 
+int collab_fighting_max(vector<character> heroes, map<pair<int, int>, collaboration> collab, 
 	vector<int> team_heroes, vector<int> team_villains, vector<int> tabu_list)
 {
-	int i, idHero = 0, value, value_max = 0;
-	unsigned j, k;
+	unsigned i, j, idHero = 0, value, value_max = 0;
 	
-	for (i = 1; i <= HEROES_SIZE; i++) {
+	for (i = 0; i < heroes.size(); i++) {
 		// se o heroi nao esta na solucao e nem na lista tabu
-		if(!in_vector(team_heroes, i) && !in_vector(tabu_list, i)){
+		if(!in_vector(team_heroes, heroes[i].id) && !in_vector(tabu_list, heroes[i].id)){
 			value = 0;
 			// calcula a colaboracao dele com os herois do time
 			for (j = 0; j < team_heroes.size(); j++) {
-				for (k = 0; k < collab.size(); k++) {
-					if(collab[k].c1 == i && collab[k].c2 == team_heroes[j]){
-						value += collab[k].value;
-						break;
-					}
-				}
+				value += collab[make_pair(heroes[i].id, team_heroes[j])].value;
 			}
 			
 			// calcula a fighting_experience desse heroi com os viloes
 			for (j = 0; j < team_villains.size(); j++) {
-				for (k = 0; k < collab.size(); k++) {
-					if(collab[k].c1 == i && collab[k].c2 == team_villains[j]){
-						value += collab[k].value;
-						break;
-					}
-				}
+				value += collab[make_pair(heroes[i].id, team_villains[j])].value;
 			}
 			
 			// se o valor encontrado para esse heroi for maior, atualiza
 			if(value_max < value) {
 				value_max = value;
-				idHero = i;
+				idHero = heroes[i].id;
 			}
 		}
 	}
+
 	return idHero;
 }
 
@@ -360,14 +326,14 @@ void add_tabu_list(vector<int> &tabu_list, vector<int> team_villains,
 }
 
 vector<int> solution_without_budget(vector<character> heroes, vector<character> villains, 
-	vector<collaboration> collab, vector<int> team_villains, int hasbudget)
+	map<pair<int, int>, collaboration> collab, vector<int> team_villains, int hasbudget)
 {
 	unsigned int idHero, idRm = 1, cont = 0, teamMaxSize = team_villains.size();
 	vector<int> team_heroes, tabu_list;
 	bool is_viavel = false;
 	
 	// busca heroi com maior fighting_experience contra os viloes inclui na solucao
-	idHero = fighting_experience_max(collab, team_villains);
+	idHero = fighting_experience_max(heroes, collab, team_villains);
 	team_heroes.push_back(idHero);
 	
 	do {
@@ -400,7 +366,7 @@ vector<int> solution_without_budget(vector<character> heroes, vector<character> 
 			
 			// busca o heroi que tem maior collaboration_level + fighting_experience
 			// e que nao esteja na lista tabu, acrescenta na solucao
-			idHero = collab_fighting_max(collab, team_heroes, team_villains, tabu_list);
+			idHero = collab_fighting_max(heroes, collab, team_heroes, team_villains, tabu_list);
 			team_heroes.push_back(idHero);
 			
 			//printTeam(team_heroes);
@@ -411,7 +377,7 @@ vector<int> solution_without_budget(vector<character> heroes, vector<character> 
 }
 
 vector<int> solution_with_budget(vector<character> heroes, vector<character> villains, 
-	vector<collaboration> collab, vector<int> team_villains, double budget, int hasbudget)
+	map<pair<int, int>, collaboration> collab, vector<int> team_villains, double budget, int hasbudget)
 {
 	unsigned int i, teamMaxSize = team_villains.size();
 	int idHero = 0, idRm, avgBudget, cost, maxCost, minCost;
@@ -488,7 +454,7 @@ vector<int> solution_with_budget(vector<character> heroes, vector<character> vil
 			
 			// busca o heroi que tem maior collaboration_level + fighting_experience
 			// e que nao esteja na lista tabu, acrescenta na solucao
-			idHero = collab_fighting_max(collab, team_heroes, team_villains, tabu_list);
+			idHero = collab_fighting_max(heroes, collab, team_heroes, team_villains, tabu_list);
 			team_heroes.push_back(idHero);
 			
 			//printTeam(team_heroes);

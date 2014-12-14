@@ -5,6 +5,7 @@
 #include <fstream>
 #include <algorithm>
 #include <vector>
+#include <map>
 #include <string>
 #include <time.h>
 #include <stdlib.h>
@@ -15,7 +16,7 @@
 using namespace std;
 
 void readInstance(const char *instance, vector<character> &heroes,
-	vector<character> &villains, vector<collaboration> &collab,
+	vector<character> &villains, map<pair<int, int>, collaboration> &collab,
 	vector<int> &team_villains)
 {
 	int id, intelligence, strength, speed, durability, energy, fighting,
@@ -61,10 +62,10 @@ void readInstance(const char *instance, vector<character> &heroes,
 
 	// faz a leitura do shared_comic_books e cria o vetor de colaboracoes
 	while (shared_comic_books.read_row(c1, c2, value)) {
-		collab.push_back(collaboration(c1, c2, value));
+		collab[make_pair(c1, c2)] = collaboration(c1, c2, value);
 	}
 
-	// faz a leitura do file3 e cria o vetor de team_villains
+	// faz a leitura do villains_file e cria o vetor de team_villains
 	string line;
 	while (getline(villains_file, line, ' ')) {
 		if (!line.empty()) {
@@ -78,7 +79,7 @@ void readInstance(const char *instance, vector<character> &heroes,
 }
 
 void printInstance(vector<character> heroes, vector<character> villains, 
-	vector<collaboration> collab, vector<int> team_villains)
+	map<pair<int, int>, collaboration> collab, vector<int> team_villains)
 {
 	unsigned int i;
 	cout << "HEROES\n";
@@ -101,11 +102,20 @@ void printInstance(vector<character> heroes, vector<character> villains,
 	}
 	
 	/*cout << "\nCOLLAB\n";
-	for (i = 0; i < collab.size(); i++) {
-		cout << collab[i].c1  << " " << collab[i].c2 << " " << 
-			collab[i].value << "\n";
+	unsigned int j;
+	for (i = 0; i < heroes.size(); i++) {
+		for (j = 0; j < heroes.size(); j++) {
+			collaboration character_collab = collab[make_pair(heroes[i].id, heroes[j].id)];
+			cout << character_collab.c1  << " " << character_collab.c2 << " "
+				<< character_collab.value << "\n";
+		}
+		for (j = 0; j < villains.size(); j++) {
+			collaboration character_collab = collab[make_pair(heroes[i].id, villains[j].id)];
+			cout << character_collab.c1  << " " << character_collab.c2 << " "
+				<< character_collab.value << "\n";
+		}
 	}*/
-	
+
 	cout << "\nTEAM VILLAINS\n";
 	cout << team_villains.size() << endl;
 	for (i = 0; i < team_villains.size(); i++) {
@@ -135,7 +145,7 @@ void printSolution(vector<int> team_heroes, vector<int> team_villains,
 int main(int argc, char **argv)
 {
 	vector<character> heroes, villains;
-	vector<collaboration> collab;
+	map<pair<int, int>, collaboration> collab;
 	vector<int> team_heroes, team_villains;
 	int has_budget, collaboration_lv, fighting_exp;
 	double budget;
@@ -150,8 +160,14 @@ int main(int argc, char **argv)
    readInstance(argv[1], heroes, villains, collab, team_villains);
    //printInstance(heroes, villains, collab, team_villains);
 
+   //sort(collab.begin(), collab.end(), greater<collaboration>());
 
 	if(has_budget){
+		/*for (i = 0; i < heroes.size(); i++) {
+			heroes[i].cost = calculate_hero_cost(heroes, heroes[i].id);
+		}*/
+		//sort(heroes.begin(), heroes.end(), greater<character>());
+
 		budget = calculate_budget(heroes, villains, collab, team_villains);
 		team_heroes = solution_with_budget(heroes,villains,collab,team_villains, budget, has_budget);
 	}
