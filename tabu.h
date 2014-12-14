@@ -53,12 +53,15 @@ void readInstance(const char *instance, vector<character> &heroes,
 	vector<int> &team_villains);
 
 vector<int> initial_solution(vector<character> heroes, vector<character> villains, 
-	vector<collaboration> collab, vector<int> team_villains, int budget);
+	vector<collaboration> collab, vector<int> team_villains, unsigned int budget);
 	
 int collaboration_level(vector<int> team_heroes, vector<collaboration> collab);
 
 int fighting_experience(vector<int> team_heroes, vector<int> team_villains, 
 	vector<collaboration> collab);
+
+unsigned int calculate_budget(vector<character> heroes, vector<character> villains,
+    vector<collaboration> collab, vector<int> team_villains);
 
 
 

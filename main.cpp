@@ -138,25 +138,28 @@ int main(int argc, char **argv)
 	vector<character> heroes, villains;
 	vector<collaboration> collab;
 	vector<int> team_heroes, team_villains;
-	int budget, collaboration_lv, fighting_exp;
+	int has_budget, collaboration_lv, fighting_exp;
+	unsigned int budget;
 
-   if(argc != 3)
-   {
+   if(argc != 3) {
       cout << argv[0] << " <instancia> <budget=(0,1)>\n";
       return 0;
    }
    
-   budget = atoi(argv[2]);
+   has_budget = atoi(argv[2]);
 
    readInstance(argv[1], heroes, villains, collab, team_villains);
    //printInstance(heroes, villains, collab, team_villains);
 
-	if(budget){
+
+	if(has_budget){
+		budget = calculate_budget(heroes, villains, collab, team_villains);
 		// fiz isso so pra rodar e nao dar bug
-		team_heroes = initial_solution(heroes,villains,collab,team_villains,budget);
+		team_heroes = initial_solution(heroes,villains,collab,team_villains, budget);
 	}
 	else {
-		team_heroes = initial_solution(heroes,villains,collab,team_villains,budget);
+		budget = 0;
+		team_heroes = initial_solution(heroes,villains,collab,team_villains, budget);
 	}
 	
 	collaboration_lv = collaboration_level(team_heroes, collab);

@@ -199,7 +199,7 @@ bool isHero(int idCharacter) {
 }
 
 bool is_viable_solution(vector<character> heroes, vector<character> villains, 
-	vector<collaboration> collab, vector<int> team_heroes, vector<int> team_villains, int budget)
+	vector<collaboration> collab, vector<int> team_heroes, vector<int> team_villains, unsigned int budget)
 {
 	unsigned int i, idHero, idVillain, teamMaxSize = team_villains.size();
 	vector<int> pgHeroes (6);
@@ -242,9 +242,8 @@ bool is_viable_solution(vector<character> heroes, vector<character> villains,
 		if(pgHeroes[i] < pgVillains[i]) return false;
 	}
 	
-	if(budget){
-		if(calculate_cost(heroes, team_heroes) > 
-			calculate_budget(heroes, villains, collab, team_villains)) return false;
+	if (budget > 0) {
+		if(calculate_cost(heroes, team_heroes) > budget) return false;
 	}
 	
 	return true;
@@ -339,7 +338,7 @@ void add_tabu_list(vector<int> &tabu_list, vector<int> team_villains,
 }
 
 vector<int> initial_solution(vector<character> heroes, vector<character> villains, 
-	vector<collaboration> collab, vector<int> team_villains, int budget)
+	vector<collaboration> collab, vector<int> team_villains, unsigned int budget)
 {
 	unsigned int idHero, idRm = 1, cont = 0, teamMaxSize = team_villains.size();
 	vector<int> team_heroes, tabu_list;
