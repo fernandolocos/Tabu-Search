@@ -1,7 +1,7 @@
 tabu_search
 ===========
 
-Compiler
+Compile
 
 ```
     $ make cpp 

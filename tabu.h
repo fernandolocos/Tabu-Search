@@ -3,11 +3,13 @@
 #include <vector>
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <string>
 
 #define HEROES_SIZE 381
 #define VILLAINS_SIZE 386
-#define TABU_LIST_MAX 10
+#define TABU_LIST_MAX_1 10
+#define TABU_LIST_MAX_2 150
 
 using namespace std;
 
@@ -48,19 +50,33 @@ struct collaboration {
     };
 };
 
+// cria uma estrutura que armazena custos e ids
+typedef struct Costs {
+	int id;
+	int cost;
+	
+	Costs(int id, int cost){
+		this->id = id;
+		this->cost = cost;
+	}
+} Costs;
+
 void readInstance(const char *instance, vector<character> &heroes, 
 	vector<character> &villains, vector<collaboration> &collab, 
 	vector<int> &team_villains);
 
-vector<int> initial_solution(vector<character> heroes, vector<character> villains, 
-	vector<collaboration> collab, vector<int> team_villains, unsigned int budget);
+vector<int> solution_without_budget(vector<character> heroes, vector<character> villains, 
+	vector<collaboration> collab, vector<int> team_villains, int hasbudget);
+	
+vector<int> solution_with_budget(vector<character> heroes, vector<character> villains, 
+	vector<collaboration> collab, vector<int> team_villains, double budget, int hasbudget);
 	
 int collaboration_level(vector<int> team_heroes, vector<collaboration> collab);
 
 int fighting_experience(vector<int> team_heroes, vector<int> team_villains, 
 	vector<collaboration> collab);
 
-unsigned int calculate_budget(vector<character> heroes, vector<character> villains,
+double calculate_budget(vector<character> heroes, vector<character> villains,
     vector<collaboration> collab, vector<int> team_villains);
 
 

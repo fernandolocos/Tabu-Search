@@ -114,23 +114,22 @@ void printInstance(vector<character> heroes, vector<character> villains,
 }
 
 void printSolution(vector<int> team_heroes, vector<int> team_villains, 
-	int collaboration_lv, int fighting_exp)
+	int collaboration_lv, int fighting_exp, double budget)
 {
-	//unsigned int i;
+	unsigned int i;
 	int solution = collaboration_lv + fighting_exp;
 	
-	/*cout << "\nTEAM VILLAINS\n";
-	for (i = 0; i < team_villains.size(); i++) {
-		cout << team_villains[i] << "\n";
+	if(budget) {
+		cout << solution <<" "<< collaboration_lv <<" "<< fighting_exp 
+			<<" "<<	team_heroes[0];
+		for (i = 1; i < team_heroes.size(); i++) {
+			cout << "," << team_heroes[i];
+		}
+		cout <<" "<< budget << endl;
 	}
-	
-	cout << "\nTEAM HEROES\n";
-	for (i = 0; i < team_heroes.size(); i++) {
-		cout << team_heroes[i] << "\n";
-	}*/
-	
-	cout << "  " << solution << "       " << collaboration_lv << "      " 
-		<<	fighting_exp << "\n";
+	else {	
+		cout << solution <<" "<< collaboration_lv <<" "<< fighting_exp << endl;
+	}
 }
 
 int main(int argc, char **argv)
@@ -139,7 +138,7 @@ int main(int argc, char **argv)
 	vector<collaboration> collab;
 	vector<int> team_heroes, team_villains;
 	int has_budget, collaboration_lv, fighting_exp;
-	unsigned int budget;
+	double budget;
 
    if(argc != 3) {
       cout << argv[0] << " <instancia> <budget=(0,1)>\n";
@@ -154,17 +153,16 @@ int main(int argc, char **argv)
 
 	if(has_budget){
 		budget = calculate_budget(heroes, villains, collab, team_villains);
-		// fiz isso so pra rodar e nao dar bug
-		team_heroes = initial_solution(heroes,villains,collab,team_villains, budget);
+		team_heroes = solution_with_budget(heroes,villains,collab,team_villains, budget, has_budget);
 	}
 	else {
 		budget = 0;
-		team_heroes = initial_solution(heroes,villains,collab,team_villains, budget);
+		team_heroes = solution_without_budget(heroes,villains,collab,team_villains, has_budget);
 	}
 	
 	collaboration_lv = collaboration_level(team_heroes, collab);
 	fighting_exp = fighting_experience(team_heroes, team_villains, collab);
-	printSolution(team_heroes, team_villains, collaboration_lv, fighting_exp);
+	printSolution(team_heroes, team_villains, collaboration_lv, fighting_exp, budget);
 	
    return 0;
 }

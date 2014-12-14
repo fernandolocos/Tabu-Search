@@ -1,31 +1,30 @@
 #!/usr/bin/env bash
 INSTANCES=$(ls data/instances/*.txt | sort -n -t V -k 2)
 
-echo -e "----------------------------------------" > our_results.txt
+echo -e "---------------" > our_results.txt
 echo -e "without_budget" >> our_results.txt
-echo -e "----------------------------------------" >> our_results.txt
+echo -e "---------------" >> our_results.txt
 echo -e "INST_NAME  SOLUTION  COLLAB  FIGHT_EXP" >> our_results.txt
 COUNT=0
 for f in $INSTANCES
 do
   NAMES[$COUNT]=${f##*/}
-  echo "Running ${NAMES[$COUNT]%.*}"
+  echo "Running ${NAMES[$COUNT]%.*} without budget"
   COLLABORATION[$COUNT]=$(./tabu $f 0)
   echo -e "${NAMES[$COUNT]%.*}\t${COLLABORATION[$COUNT]}" >> our_results.txt
   COUNT=$[$COUNT+1]
 done
-
-#echo -e "----------------------------------------" >> our_results.txt
-#echo -e "\twith_budget\t" >> our_results.txt
-#echo -e "----------------------------------------" >> our_results.txt
-#echo -e "INST_NAME  SOLUTION  COLLAB  FIGHT_EXP  HEROES_TEAM  BUDGET" >> our_results.txt
-#for f in $INSTANCES
-#do
-#  NAMES[$COUNT]=${f##*/}
-#  echo "Running ${NAMES[$COUNT]%.*} with budget"
-#  COLLABORATION[$COUNT]=$(./tabu $f 1)
-#  echo -e "${NAMES[$COUNT]%.*}\t${COLLABORATION[$COUNT]}}" >> our_results.txt
-#  COUNT=$[$COUNT+1]
-#done
+echo -e "-------------" >> our_results.txt
+echo -e "with_budget" >> our_results.txt
+echo -e "-------------" >> our_results.txt
+echo -e "INST_NAME  SOLUTION  COLLAB  FIGHT_EXP  HEROES_TEAM  BUDGET" >> our_results.txt
+for f in $INSTANCES
+do
+  NAMES[$COUNT]=${f##*/}
+  echo "Running ${NAMES[$COUNT]%.*} with budget"
+  COLLABORATION[$COUNT]=$(./tabu $f 1)
+  echo -e "${NAMES[$COUNT]%.*}\t${COLLABORATION[$COUNT]}" >> our_results.txt
+  COUNT=$[$COUNT+1]
+done
 
 echo "$(column -t our_results.txt)" > our_results.txt
