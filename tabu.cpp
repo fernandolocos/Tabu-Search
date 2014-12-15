@@ -408,7 +408,7 @@ vector<int> solution_with_budget(vector<character> heroes, vector<character> vil
     avgBudget = budget / (int)teamMaxSize;
 
 	// loop externo que faz a busca local
-	for(i = 0; i < 10; i++){
+	for(i = 0; i < ITERATIONS; i++){
 		// se nao for a primeira iteracao que ja tem uma solucao pronta,
 		// busque no vetor o heroi com maior custo que respeite a restrição:
 		// custo <= budget médio e nao esta na lista tabu e coloque na solucao
