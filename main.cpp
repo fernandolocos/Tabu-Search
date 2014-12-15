@@ -1,6 +1,3 @@
-// uncomment if error 'undefined reference to `pthread_create'' appear
-//#define CSV_IO_NO_THREAD 1;
-
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -77,50 +74,6 @@ void readInstance(const char *instance, vector<character> &heroes,
     villains_file.close();
 }
 
-void printInstance(vector<character> heroes, vector<character> villains,
-                   map<pair<int, int>, collaboration> collab, vector<int> team_villains) {
-    unsigned int i;
-    cout << "HEROES\n";
-    //for (i = 0; i < heroes.size(); i++) {
-    for (i = 0; i < heroes.size(); i++) {
-        cout << heroes[i].id  << " " << heroes[i].name << " " <<
-             heroes[i].intelligence << " " <<
-             heroes[i].strength << " " << heroes[i].speed << " " <<
-             heroes[i].durability << " " << heroes[i].energy << " " <<
-             heroes[i].fighting << " " << heroes[i].numberAppeared << "\n";
-    }
-
-    cout << "\nVILLAINS\n";
-    for (i = 0; i < villains.size(); i++) {
-        cout << villains[i].id  << " " << villains[i].name << " " <<
-             villains[i].intelligence << " " <<
-             villains[i].strength << " " << villains[i].speed << " " <<
-             villains[i].durability << " " << villains[i].energy << " " <<
-             villains[i].fighting << " " << villains[i].numberAppeared << "\n";
-    }
-
-    /*cout << "\nCOLLAB\n";
-    unsigned int j;
-    for (i = 0; i < heroes.size(); i++) {
-        for (j = 0; j < heroes.size(); j++) {
-            collaboration character_collab = collab[make_pair(heroes[i].id, heroes[j].id)];
-            cout << character_collab.c1  << " " << character_collab.c2 << " "
-                << character_collab.value << "\n";
-        }
-        for (j = 0; j < villains.size(); j++) {
-            collaboration character_collab = collab[make_pair(heroes[i].id, villains[j].id)];
-            cout << character_collab.c1  << " " << character_collab.c2 << " "
-                << character_collab.value << "\n";
-        }
-    }*/
-
-    cout << "\nTEAM VILLAINS\n";
-    cout << team_villains.size() << endl;
-    for (i = 0; i < team_villains.size(); i++) {
-        cout << team_villains[i] << "\n";
-    }
-}
-
 void printSolution(vector<int> team_heroes, vector<int> team_villains,
                    int collaboration_lv, int fighting_exp, double budget) {
     unsigned int i;
@@ -150,21 +103,27 @@ int main(int argc, char **argv) {
         return 0;
     }
 
+	 // tem budget ou nao
     has_budget = atoi(argv[2]);
-
+    
+    // le a instancia
     readInstance(argv[1], heroes, villains, collab, team_villains);
-    //printInstance(heroes, villains, collab, team_villains);
 
+	 // se tem budget
     if(has_budget) {
+    	  // calcula o budget e chama a funcao que encontra a solucao
         budget = calculate_budget(heroes, villains, collab, team_villains);
         team_heroes = solution_with_budget(heroes,villains,collab,team_villains, budget, has_budget);
     } else {
         budget = 0;
+        // chama a funcao que encontra a solucao sem budget
         team_heroes = solution_without_budget(heroes,villains,collab,team_villains, has_budget);
     }
-
+	 
+	 // calcula os valores da funcao objetivo da solucao encontrada
     collaboration_lv = collaboration_level(team_heroes, collab);
     fighting_exp = fighting_experience(team_heroes, team_villains, collab);
+    // imprime a solucao
     printSolution(team_heroes, team_villains, collaboration_lv, fighting_exp, budget);
 
     return 0;

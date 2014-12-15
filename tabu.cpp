@@ -86,6 +86,7 @@ double calculate_avg_popularity(vector<character> p) {
     return value;
 }
 
+// calcula o budget
 double calculate_budget(vector<character> heroes, vector<character> villains,
                         map<pair<int, int>, collaboration> collab, vector<int> team_villains) {
     unsigned int i;
@@ -127,10 +128,8 @@ double calculate_cost(vector<character> heroes, vector<int> team_heroes) {
     for (i = 0; i < team_heroes.size(); i++) {
         // calcula o powergrid do heroi
         avgPg = calculate_avg_powergrid_character(heroes, heroes, team_heroes[i]);
-
         // busca a popularidade do heroi
         avgPop = heroes[team_heroes[i]-1].numberAppeared;
-
         cost += avgPg * avgPop;
     }
     return cost;
@@ -145,18 +144,15 @@ double calculate_cost(vector<character> heroes, int idHero) {
 }
 
 int fighting_experience(vector<int> team_heroes, vector<int> team_villains,
-                        map<pair<int, int>, collaboration> collab) {
+	map<pair<int, int>, collaboration> collab) {
     unsigned int i, j;
     int fighting_exp = 0;
 
-    //cout << "\nFIGHTING EXPERIENCE\n";
     for (i = 0; i < team_heroes.size(); i++) {
         for (j = 0; j < team_villains.size(); j++) {
-        		//cout << team_heroes[i] << "->" << team_villains[j] << "=" << collab[make_pair(team_heroes[i], team_villains[j])].value << "\n" ;
             fighting_exp += collab[make_pair(team_heroes[i],team_villains[j])].value;
         }
     }
-
     return fighting_exp;
 }
 
@@ -164,15 +160,12 @@ int collaboration_level(vector<int> team_heroes, map<pair<int, int>, collaborati
     unsigned int i, j;
     int collaboration_lv = 0;
 
-    //cout << "\nCOLABORACOES HEROIS\n";
     // calcula a colaboracao entre os herois
     for (i = 0; i < team_heroes.size()-1; i++) {
         for (j = i+1; j < team_heroes.size(); j++) {
-            //cout << team_heroes[i] << "->" << team_heroes[j] << "=" << collab[make_pair(team_heroes[i], team_heroes[j])].value << "\n" ;
             collaboration_lv += collab[make_pair(team_heroes[i], team_heroes[j])].value;
         }
     }
-
     return collaboration_lv;
 }
 
@@ -186,6 +179,7 @@ bool in_vector(vector<int> v, int id) {
     return false;
 }
 
+// verifica se e uma solucao viavel
 bool is_viable_solution(vector<character> heroes, vector<character> villains,
                         map<pair<int, int>, collaboration> collab, vector<int> team_heroes, vector<int> team_villains, double budget) {
     unsigned int i, idHero, idVillain, teamMaxSize = team_villains.size();
@@ -232,7 +226,6 @@ bool is_viable_solution(vector<character> heroes, vector<character> villains,
     if (budget > 0) {
         if(calculate_cost(heroes, team_heroes) > budget) return false;
     }
-
     return true;
 }
 
@@ -283,17 +276,7 @@ int collab_fighting_max(vector<character> heroes, map<pair<int, int>, collaborat
             }
         }
     }
-
     return idHero;
-}
-
-void printTeam(vector<int> team) {
-    unsigned int i;
-    cout << "Team\n";
-    for (i = 0; i < team.size(); i++) {
-        cout << team[i] << " ";
-    }
-    cout << "\n";
 }
 
 // adiciona um heroi na lista tabu, FIFO
@@ -310,18 +293,34 @@ void add_tabu_list(vector<int> &tabu_list, vector<int> team_villains,
     tabu_list.push_back(idHero);
 }
 
+// algoritmo guloso - encontra uma solucao gulosa, mesmo que nao seja viavel
+vector<int> local_search(vector<character> heroes,	map<pair<int, int>, 
+	collaboration> collab, vector<int> team_villains, vector<int> tabu_list) 
+{
+	vector<int> team_heroes;
+	unsigned int idHero, teamMaxSize = team_villains.size();
+	
+	do{
+		idHero = collab_fighting_max(heroes, collab, team_heroes, team_villains, tabu_list);
+		team_heroes.push_back(idHero);
+	} while(team_heroes.size() < teamMaxSize);
+	
+	return team_heroes;
+}
+
+// busca local - algoritmo que encontra a solucao sem budget
 vector<int> solution_without_budget(vector<character> heroes, vector<character> villains,
-	map<pair<int, int>, collaboration> collab, vector<int> team_villains, int hasbudget) {
-    unsigned int i, j, idHero, idRm = 1, cont = 0, teamMaxSize = team_villains.size();
-    int solution, best_solution = 0, collaboration_lv, fighting_exp;
-    vector<int> team_heroes, best_team (teamMaxSize), tabu_list;
-    bool is_viavel = false;
+	map<pair<int, int>, collaboration> collab, vector<int> team_villains, int hasbudget) 
+{
+	unsigned int i, j, idHero, idRm = 1, cont = 0, teamMaxSize = team_villains.size();
+	int solution, best_solution = 0, collaboration_lv, fighting_exp;
+	vector<int> team_heroes, best_team (teamMaxSize), tabu_list;
+	bool is_viavel = false;
 
-    // busca heroi com maior fighting_experience contra os viloes inclui na solucao
-    idHero = fighting_experience_max(heroes, collab, team_villains);
-    team_heroes.push_back(idHero);
+	// inicia com time encontrado por algoritmo guloso, nao necessariamente viavel
+	team_heroes = local_search(heroes, collab, team_villains, tabu_list);
 
-	// loop externo
+	// loop externo que faz a busca local
 	for(i = 0; i < ITERATIONS; i++){
 		do {
 		  if(team_heroes.size() == teamMaxSize &&
@@ -336,26 +335,18 @@ vector<int> solution_without_budget(vector<character> heroes, vector<character> 
 				// se o numero de herois superou o numero de viloes
 				if(team_heroes.size() >= teamMaxSize) {
 				    // retire um heroi e acrescenta na lista tabu
-				    /*idRand = rand() % team_heroes.size();
-				    idHero = team_heroes[idRand];
-				    team_heroes.erase(team_heroes.begin()+idRand);*/
-
 				    idHero = team_heroes[team_heroes.size()-idRm];
 				    team_heroes.erase(team_heroes.end()-idRm);
 				    add_tabu_list(tabu_list, team_villains, idHero, hasbudget);
 
 				    idRm = 1;
 				    cont++;
-				    //cout << "Removeu\n";
-				    //printTeam(team_heroes);
 				}
 
 				// busca o heroi que tem maior collaboration_level + fighting_experience
 				// e que nao esteja na lista tabu, acrescenta na solucao
 				idHero = collab_fighting_max(heroes, collab, team_heroes, team_villains, tabu_list);
 				team_heroes.push_back(idHero);
-
-				//printTeam(team_heroes);
 		  }
 		} while(!is_viavel);
 		
@@ -363,9 +354,6 @@ vector<int> solution_without_budget(vector<character> heroes, vector<character> 
 		collaboration_lv = collaboration_level(team_heroes, collab);
  		fighting_exp = fighting_experience(team_heroes, team_villains, collab);
  		solution = collaboration_lv + fighting_exp;
- 		
- 		//printTeam(team_heroes);
- 		//cout << "i=" << i << " sol=" << solution << endl;
 		
 		// se for a primeira iteracao
 		if(i == 0){
@@ -393,14 +381,19 @@ vector<int> solution_without_budget(vector<character> heroes, vector<character> 
 	return best_team;
 }
 
+// busca local - algoritmo que encontra a solucao com budget
 vector<int> solution_with_budget(vector<character> heroes, vector<character> villains,
-                                 map<pair<int, int>, collaboration> collab, vector<int> team_villains, double budget, int hasbudget) {
+	map<pair<int, int>, collaboration> collab, vector<int> team_villains, double budget, int hasbudget) 
+{
     unsigned int i, j, teamMaxSize = team_villains.size();
     int idHero = 0, idRm, avgBudget, cost, maxCost, minCost, solution, 
     	best_solution = 0, collaboration_lv, fighting_exp;
     vector<int> team_heroes, tabu_list, best_team (teamMaxSize);
     bool is_viavel = false;
     vector<Costs> heroCosts;
+    
+    // inicia com time encontrado por algoritmo guloso, nao necessariamente viavel
+    team_heroes = local_search(heroes, collab, team_villains, tabu_list);
 
     // cria um vetor com os custos de todos os herois
     for(i = 0; i < heroes.size(); i++) {
@@ -414,77 +407,68 @@ vector<int> solution_with_budget(vector<character> heroes, vector<character> vil
     budget = calculate_budget(heroes, villains, collab, team_villains);
     avgBudget = budget / (int)teamMaxSize;
 
-	// loop externo
-	for(i = 0; i < ITERATIONS; i++){
-		// Busque no vetor o heroi com maior custo que respeite a restrição:
-		// custo <= budget médio e nao esta na lista tabu
-		for(j = 0; j < heroCosts.size(); j++) {
-		  if(heroCosts[j].cost <= avgBudget && !in_vector(tabu_list, heroCosts[j].id)) {
-				idHero = heroCosts[j].id;
-				break;
-		  }
+	// loop externo que faz a busca local
+	for(i = 0; i < 10; i++){
+		// se nao for a primeira iteracao que ja tem uma solucao pronta,
+		// busque no vetor o heroi com maior custo que respeite a restrição:
+		// custo <= budget médio e nao esta na lista tabu e coloque na solucao
+		if(i > 0){
+			for(j = 0; j < heroCosts.size(); j++) {
+				//cout << "cost=" << heroCosts[j].cost << endl;
+			  if(heroCosts[j].cost <= avgBudget && !in_vector(tabu_list, heroCosts[j].id)) {
+					idHero = heroCosts[j].id;
+					break;
+			  }
+			}
+			team_heroes.push_back(idHero);
 		}
-
-		// inclua este heroi na solucao
-		team_heroes.push_back(idHero);
-
+		
 		do {
 		  // se a solucao eh viavel retorna o team heroes
 		  if(team_heroes.size() == teamMaxSize &&
-				    is_viable_solution(heroes,villains,collab,team_heroes,team_villains,budget)) {
-				is_viavel = true;
+				is_viable_solution(heroes,villains,collab,team_heroes,team_villains,budget)) {
+					is_viavel = true;
 		  } else {
 				// se o numero de herois superou o numero de viloes
 				if(team_heroes.size() >= teamMaxSize) {
-				    // se o custo do time eh maior que o budget retira o heroi de
-				    // maior custo, caso contrario tiro o de menor custo
-				    maxCost = 0;
-				    minCost = INT_MAX;
-				    idRm = 0;
-				    //cout << "cost=" << calculate_cost(heroes, team_heroes)  << " budget=" << budget << endl;
-				    if(calculate_cost(heroes, team_heroes) > budget) {
-				        for(j = 0; j < team_heroes.size(); j++) {
-				            cost = calculate_cost(heroes, team_heroes[j]);
-				            //cout << "idHero=" << team_heroes[j]  << " costHeroi=" << cost << endl;
-				            if(maxCost < cost) {
-				                maxCost = cost;
-				                idRm = j;
-				            }
-				        }
-				    } else {
-				        for(j = 0; j < team_heroes.size(); j++) {
-				            cost = calculate_cost(heroes, team_heroes[j]);
-				            if(minCost > cost) {
-				                minCost = cost;
-				                idRm = j;
-				            }
-				        }
-				    }
-
-				    idHero = team_heroes[idRm];
-				    team_heroes.erase(team_heroes.begin()+idRm);
-				    add_tabu_list(tabu_list, team_villains, idHero, hasbudget);
-
-				    //cout << "Removeu\n";
-				    //printTeam(team_heroes);
+					 maxCost = 0;
+					 minCost = INT_MAX;
+					 idRm = 0;
+					 // se o custo do time eh maior que o budget retira o heroi de
+					 // maior custo, caso contrario tiro o de menor custo
+					 if(calculate_cost(heroes, team_heroes) > budget) {
+					     for(j = 0; j < team_heroes.size(); j++) {
+					         cost = calculate_cost(heroes, team_heroes[j]);
+					         if(maxCost < cost) {
+					             maxCost = cost;
+					             idRm = j;
+					         }
+					     }
+					 } else {
+					     for(j = 0; j < team_heroes.size(); j++) {
+					         cost = calculate_cost(heroes, team_heroes[j]);
+					         if(minCost > cost) {
+					             minCost = cost;
+					             idRm = j;
+					         }
+					     }
+					 }
+					 idHero = team_heroes[idRm];
+					 team_heroes.erase(team_heroes.begin()+idRm);
+					 add_tabu_list(tabu_list, team_villains, idHero, hasbudget);
 				}
 
 				// busca o heroi que tem maior collaboration_level + fighting_experience
 				// e que nao esteja na lista tabu, acrescenta na solucao
 				idHero = collab_fighting_max(heroes, collab, team_heroes, team_villains, tabu_list);
 				team_heroes.push_back(idHero);
-
-				//printTeam(team_heroes);
 		  }
 		} while(!is_viavel);
-	
+
 		// calcula o valor da solucao
 		collaboration_lv = collaboration_level(team_heroes, collab);
 		fighting_exp = fighting_experience(team_heroes, team_villains, collab);
 		solution = collaboration_lv + fighting_exp;
-
-		//printTeam(team_heroes);
-		//cout << "i=" << i << " sol=" << solution << endl;
 
 		// se for a primeira iteracao
 		if(i == 0){
@@ -497,12 +481,12 @@ vector<int> solution_with_budget(vector<character> heroes, vector<character> vil
 				best_solution = solution;
 			}
 		}
-	
+
 		// insere a solucao encontrada na lista tabu
 		for(j = 0; j < team_heroes.size(); j++){
 			add_tabu_list(tabu_list, team_villains, team_heroes[j], hasbudget);
 		}
-	
+
 		// inicializa as variaveis
 		team_heroes.clear();
 		is_viavel = false;

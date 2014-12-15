@@ -9,7 +9,7 @@
 
 #define TABU_LIST_MAX_1 10
 #define TABU_LIST_MAX_2 150
-#define ITERATIONS 10
+#define ITERATIONS 20
 
 using namespace std;
 
@@ -57,9 +57,9 @@ struct collaboration {
 // cria uma estrutura que armazena custos e ids
 typedef struct Costs {
     int id;
-    int cost;
+    double cost;
 
-    Costs(int id, int cost) {
+    Costs(int id, double cost) {
         this->id = id;
         this->cost = cost;
     }
