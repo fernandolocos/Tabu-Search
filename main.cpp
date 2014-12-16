@@ -103,15 +103,15 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-	 // tem budget ou nao
+    // tem budget ou nao
     has_budget = atoi(argv[2]);
-    
+
     // le a instancia
     readInstance(argv[1], heroes, villains, collab, team_villains);
 
-	 // se tem budget
+    // se tem budget
     if(has_budget) {
-    	  // calcula o budget e chama a funcao que encontra a solucao
+        // calcula o budget e chama a funcao que encontra a solucao
         budget = calculate_budget(heroes, villains, collab, team_villains);
         team_heroes = solution_with_budget(heroes,villains,collab,team_villains, budget, has_budget);
     } else {
@@ -119,8 +119,8 @@ int main(int argc, char **argv) {
         // chama a funcao que encontra a solucao sem budget
         team_heroes = solution_without_budget(heroes,villains,collab,team_villains, has_budget);
     }
-	 
-	 // calcula os valores da funcao objetivo da solucao encontrada
+
+    // calcula os valores da funcao objetivo da solucao encontrada
     collaboration_lv = collaboration_level(team_heroes, collab);
     fighting_exp = fighting_experience(team_heroes, team_villains, collab);
     // imprime a solucao
