@@ -8,8 +8,11 @@
 #include <string>
 
 #define TABU_LIST_MAX_1 10
-#define TABU_LIST_MAX_2 150
-#define ITERATIONS 20
+#define TABU_LIST_MAX_2 100
+#define ITERATIONS_1 20
+#define ITERATIONS_2 50
+#define PG_WEIGHT_1 10
+#define PG_WEIGHT_2 10000
 
 using namespace std;
 

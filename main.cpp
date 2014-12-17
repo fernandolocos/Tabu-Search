@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
         cout << argv[0] << " <instancia> <budget=(0,1)>\n";
         return 0;
     }
-
+    
     // tem budget ou nao
     has_budget = atoi(argv[2]);
 
